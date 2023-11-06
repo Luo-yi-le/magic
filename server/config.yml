@@ -18,15 +18,24 @@ jwt:
 aes:
   key: 1111111111111111
 mysql:
-  host: 175.27.158.145:3306
-  username: admin2
-  password: 153759.Ljx
-  db-name: mayfly-go
+  host: 127.0.0.1
+  username: root
+  password: 123456
+  db-name: magic
   config: charset=utf8mb4&loc=Local&parseTime=true
   max-idle-conns: 5
+redis:
+  host: 127.0.0.1
+  password:
+  port: 6379
+  dbNum: 10
+  poolSize: 10000
+defaultLoad:
+  mysql: true #是否默认启动mysql
+  redis: true #是否默认启动redis
 log:
    # 日志等级, trace, debug, info, warn, error, fatal
   level: info
   # file:
   #   path: ./
-  #   name: mayfly.log
+  #   name: magic.log

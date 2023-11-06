@@ -216,7 +216,7 @@ func request(rw *RequestWrapper) *ResponseWrapper {
 }
 
 func setRequestHeader(req *http.Request, header map[string]string) {
-	req.Header.Set("User-Agent", "golang/mayfly")
+	req.Header.Set("User-Agent", "golang/magic")
 	for k, v := range header {
 		req.Header.Set(k, v)
 	}

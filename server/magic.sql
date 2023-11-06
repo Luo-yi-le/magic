@@ -3,7 +3,7 @@
 
  Source Server Type    : MySQL
  Source Server Version : 50730
- Source Schema         : mayfly-go
+ Source Schema         : magic-go
 
  Target Server Type    : MySQL
  Target Server Version : 50730

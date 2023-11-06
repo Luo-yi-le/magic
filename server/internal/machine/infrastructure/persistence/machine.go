@@ -54,6 +54,7 @@ func (m *machineRepoImpl) GetById(id uint64, cols ...string) *entity.Machine {
 }
 
 func (m *machineRepoImpl) Create(entity *entity.Machine) {
+	fmt.Println(entity)
 	biz.ErrIsNilAppendErr(model.Insert(entity), "创建机器信息失败: %s")
 }
 
