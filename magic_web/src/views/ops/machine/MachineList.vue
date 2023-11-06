@@ -34,7 +34,7 @@
             </div>
 
             <el-table :data="data.list" stripe style="width: 100%" @current-change="choose">
-                <el-table-column label="选择" width="55px">
+                <el-table-column label="选择" width="55px" show-overflow-tooltip>
                     <template #default="scope">
                         <el-radio v-model="currentId" :label="scope.row.id">
                             <i></i>
@@ -42,14 +42,14 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="name" label="名称" min-width="140" show-overflow-tooltip></el-table-column>
-                <el-table-column prop="ip" label="ip:port" min-width="150">
+                <el-table-column prop="ip" label="ip:port" min-width="150" show-overflow-tooltip>
                     <template #default="scope">
                         <el-link :disabled="scope.row.status == -1" @click="showMachineStats(scope.row)" type="primary" :underline="false">{{
                             `${scope.row.ip}:${scope.row.port}`
                         }}</el-link>
                     </template>
                 </el-table-column>
-                <el-table-column prop="status" label="状态" min-width="75">
+                <el-table-column prop="status" label="状态" min-width="75" show-overflow-tooltip>
                     <template #default="scope">
                         <el-switch
                             v-auth:disabled="'machine:update'"
@@ -65,15 +65,15 @@
                         ></el-switch>
                     </template>
                 </el-table-column>
-                <el-table-column prop="username" label="用户名" min-width="90"></el-table-column>
-                <el-table-column prop="projectName" label="项目" min-width="120"></el-table-column>
+                <el-table-column prop="username" label="用户名" min-width="90" show-overflow-tooltip></el-table-column>
+                <el-table-column prop="projectName" label="项目" min-width="120" show-overflow-tooltip></el-table-column>
                 <el-table-column prop="remark" label="备注" min-width="250" show-overflow-tooltip></el-table-column>
-                <el-table-column prop="createTime" label="创建时间" min-width="165">
+                <el-table-column prop="createTime" label="创建时间" min-width="165" show-overflow-tooltip>
                     <template #default="scope">
                         {{ $filters.dateFormat(scope.row.createTime) }}
                     </template>
                 </el-table-column>
-                <el-table-column prop="creator" label="创建者" min-width="80"></el-table-column>
+                <el-table-column prop="creator" label="创建者" min-width="80" show-overflow-tooltip></el-table-column>
                 <el-table-column label="操作" min-width="335" fixed="right">
                     <template #default="scope">
                         <span v-auth="'machine:terminal'">

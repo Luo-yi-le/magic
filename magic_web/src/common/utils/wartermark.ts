@@ -14,7 +14,7 @@ const setWatermark = (str: any) => {
     cans.fillStyle = 'rgba(200, 200, 200, 0.35)';
     cans.textAlign = 'left';
     cans.textBaseline = 'Middle';
-    // cans.fillText('mayfly go', can.width / 4, can.height )
+    // cans.fillText('magic go', can.width / 4, can.height )
     cans.fillText(str, can.width / 8, can.height / 2);
 
     const div = document.createElement('div');

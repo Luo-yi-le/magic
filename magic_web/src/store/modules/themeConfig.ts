@@ -90,7 +90,7 @@ const themeConfigModule: Module<ThemeConfigState, RootStateTypes> = {
             // 是否开启水印
             isWartermark: false,
             // 水印文案
-            wartermarkText: 'mayfly',
+            wartermarkText: 'magic',
 
             /* 其它设置
             ------------------------------- */
@@ -124,9 +124,9 @@ const themeConfigModule: Module<ThemeConfigState, RootStateTypes> = {
             /* 全局网站标题 / 副标题
             ------------------------------- */
             // 网站主标题（菜单导航、浏览器当前网页标题）
-            globalTitle: 'mayfly',
+            globalTitle: 'magic',
             // 网站副标题（登录页顶部文字）
-            globalViceTitle: 'mayfly',
+            globalViceTitle: 'magic',
             // 默认初始语言，可选值"<zh-cn|en|zh-tw>"，默认 zh-cn
             globalI18n: 'zh-cn',
             // 默认全局组件大小，可选值"<|large|default|small>"，默认 ''

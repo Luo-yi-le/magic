@@ -5,7 +5,7 @@
         </div>
         <div class="login-content" :class="{ 'login-content-mobile': tabsActiveName === 'mobile' }">
             <div class="login-content-main">
-                <h4 class="login-content-title">mayfly-go</h4>
+                <h4 class="login-content-title">magic-go</h4>
                 <el-tabs v-model="tabsActiveName" @tab-click="onTabsClick">
                     <el-tab-pane label="账号密码登录" name="account" :disabled="tabsActiveName === 'account'">
                         <transition name="el-zoom-in-center">
@@ -25,8 +25,8 @@
             </div>
         </div>
         <div class="login-copyright">
-            <div class="mb5 login-copyright-company">mayfly</div>
-            <div class="login-copyright-msg">mayfly</div>
+            <div class="mb5 login-copyright-company">magic</div>
+            <div class="login-copyright-msg">magic</div>
         </div>
     </div>
 </template>

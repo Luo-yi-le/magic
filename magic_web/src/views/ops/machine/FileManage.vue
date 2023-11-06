@@ -7,24 +7,24 @@
                 </div>
             </div>
             <el-table :data="fileTable" stripe style="width: 100%">
-                <el-table-column prop="name" label="名称" width>
+                <el-table-column prop="name" label="名称" width show-overflow-tooltip>
                     <template #default="scope">
                         <el-input v-model="scope.row.name" size="small" :disabled="scope.row.id != null" clearable></el-input>
                     </template>
                 </el-table-column>
-                <el-table-column prop="name" label="类型" min-width="50px">
+                <el-table-column prop="name" label="类型" min-width="50px" show-overflow-tooltip>
                     <template #default="scope">
                         <el-select :disabled="scope.row.id != null" size="small" v-model="scope.row.type" style="width: 100px" placeholder="请选择">
                             <el-option v-for="item in enums.FileTypeEnum" :key="item.value" :label="item.label" :value="item.value"></el-option>
                         </el-select>
                     </template>
                 </el-table-column>
-                <el-table-column prop="path" label="路径" width>
+                <el-table-column prop="path" label="路径" width show-overflow-tooltip>
                     <template #default="scope">
                         <el-input v-model="scope.row.path" :disabled="scope.row.id != null" size="small" clearable></el-input>
                     </template>
                 </el-table-column>
-                <el-table-column label="操作" width>
+                <el-table-column label="操作" width >
                     <template #default="scope">
                         <el-button v-if="scope.row.id == null" @click="addFiles(scope.row)" type="success" icon="success-filled" size="small" plain
                             >确定</el-button
@@ -58,6 +58,19 @@
         </el-dialog>
 
         <el-dialog :title="tree.title" v-model="tree.visible" :close-on-click-modal="false" width="70%">
+            <template #header="{ close, titleId, titleClass }">
+                <div class="dialog-header">
+                    <h4 :id="titleId" :class="titleClass">{{ tree.title }} </h4>
+                    <div class="btn-refresh">
+                        <el-button @click="refresh" circle type="primary">
+                            <el-icon style="vertical-align: middle">
+                                <Refresh />
+                            </el-icon>
+                        </el-button>
+                    </div>
+                </div>
+            </template>
+            
             <el-progress
                 v-if="uploadProgressShow"
                 style="width: 90%; margin-left: 20px"
@@ -204,7 +217,7 @@
 </template>
 
 <script lang="ts">
-import { ref, toRefs, reactive, watch, defineComponent } from 'vue';
+import { ref, toRefs, reactive, watch, defineComponent, nextTick } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { machineApi } from './api';
 
@@ -288,6 +301,10 @@ export default defineComponent({
                 node: null as any,
             },
             file: null as any,
+            load: {
+                node: null as any,
+                resolve: null as any,
+            }
         });
 
         watch(props, async (newValue) => {
@@ -416,12 +433,24 @@ export default defineComponent({
             state.tree.folder = { id: 0 };
         };
 
+        const refresh = async () => {
+            if(state.load.node.childNodes && state.load.node.childNodes.length) {
+                state.load.node.childNodes.forEach((e: any) => {
+                    fileTree.value.remove(e);
+                });
+            }
+            await nextTick()
+            await loadNode(state.load.node, state.load.resolve);            
+        }
+
         /**
          * 加载文件树节点
          * @param {Object} node
          * @param {Object} resolve
          */
         const loadNode = async (node: any, resolve: any) => {
+            state.load.node = node;
+            state.load.resolve = resolve;
             if (typeof resolve !== 'function') {
                 return;
             }
@@ -643,9 +672,17 @@ export default defineComponent({
             uploadSuccess,
             dontOperate,
             formatFileSize,
+            refresh,
         };
     },
 });
 </script>
 <style lang="scss">
+.dialog-header{
+    display: flex;
+
+    .btn-refresh {
+        margin: 0 10px;
+    }
+}
 </style>

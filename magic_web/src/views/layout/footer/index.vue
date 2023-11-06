@@ -2,7 +2,7 @@
     <div class="layout-footer mt15" v-show="isDelayFooter">
         <div class="layout-footer-warp">
             <div>vue-next-admin，Made by lyt with ❤️</div>
-            <div class="mt5">mayfly</div>
+            <div class="mt5">magic</div>
         </div>
     </div>
 </template>
