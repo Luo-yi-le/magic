@@ -127,7 +127,13 @@
                                                 <el-link type="primary" icon="document" :underline="false" style="margin-left: 2px">新建</el-link>
                                             </el-dropdown-item>
                                         </span>
+                                        <span v-auth="'machine:file:upload'">
+                                            <el-dropdown-item v-if="data.type == 'd'">
+                                                <el-link icon="upload" :underline="false" @click="folderMode">上传文件夹</el-link>
 
+                                            </el-dropdown-item>
+                                        </span>
+ 
                                         <span v-auth="'machine:file:upload'">
                                             <el-dropdown-item v-if="data.type == 'd'">
                                                 <el-upload
@@ -140,7 +146,9 @@
                                                     name="file"
                                                     style="display: inline-block; margin-left: 2px"
                                                 >
-                                                    <el-link icon="upload" :underline="false">上传</el-link>
+                                                   <template #trigger>
+                                                        <el-link icon="upload" :underline="false">上传文件</el-link>
+                                                   </template>
                                                 </el-upload>
                                             </el-dropdown-item>
                                         </span>
@@ -213,6 +221,18 @@
                 </div>
             </template>
         </el-dialog>
+
+        <Upload 
+            ref="uploadRef"
+            :before-upload="beforeUpload"
+            :on-success="uploadSuccess"
+            action=""
+            webkit-directory
+            :http-request="uploadDirectory"
+            :headers="{ token }"
+            :show-file-list="false">
+            
+        </Upload>
     </div>
 </template>
 
@@ -220,7 +240,7 @@
 import { ref, toRefs, reactive, watch, defineComponent, nextTick } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { machineApi } from './api';
-
+import Upload from '@/components/upload/index.vue'
 import { codemirror } from '@/components/codemirror';
 import { getSession } from '@/common/utils/storage';
 import enums from './enums';
@@ -231,6 +251,7 @@ export default defineComponent({
     name: 'FileManage',
     components: {
         codemirror,
+        Upload
     },
     props: {
         visible: { type: Boolean },
@@ -244,6 +265,7 @@ export default defineComponent({
         const updateFileContent = machineApi.updateFileContent;
         const files = machineApi.files;
         const fileTree: any = ref(null);
+        const uploadRef: any = ref(null);
         const token = getSession('token');
 
         const folderType = 'd';
@@ -494,7 +516,7 @@ export default defineComponent({
             return resolve(res);
         };
 
-        const showCreateFileDialog = (node: any) => {
+        const showCreateFileDialog = (node: any, data: any) => {
             isTrue(node.expanded, '请先点击展开该节点后再创建');
             state.createFileDialog.node = node;
             state.createFileDialog.visible = true;
@@ -562,7 +584,13 @@ export default defineComponent({
             state.progressNum = complete;
         };
 
-        const getUploadFile = (content: any) => {
+        const uploadDirectory = (content: any)=> {
+            const uri = `${config.baseApiUrl}/machines/${props.machineId}/files/${state.tree.folder.id}/upload/directory?token=${token}`
+            getUploadFile(content, uri)
+        }
+
+        const getUploadFile = (content: any, url?: string) => {
+            const uri = url || `${config.baseApiUrl}/machines/${props.machineId}/files/${state.tree.folder.id}/upload?token=${token}`
             const params = new FormData();
             params.append('file', content.file);
             params.append('path', state.dataObj.path);
@@ -571,7 +599,7 @@ export default defineComponent({
             params.append('token', token);
             machineApi.uploadFile
                 .request(params, {
-                    url: `${config.baseApiUrl}/machines/${props.machineId}/files/${state.tree.folder.id}/upload?token=${token}`,
+                    url: uri,
                     headers: { 'Content-Type': 'multipart/form-data; boundary=----WebKitFormBoundaryF1uyUD0tWdqmJqpl' },
                     onUploadProgress: onUploadProgress,
                     baseURL: '',
@@ -597,6 +625,10 @@ export default defineComponent({
         const beforeUpload = (file: File) => {
             state.file = file;
         };
+        const folderMode  =async (type: boolean)=> {
+            await nextTick();
+            uploadRef.value?.open()
+        }
         const getFilePath = (data: object, visible: boolean) => {
             if (visible) {
                 state.dataObj = data as any;
@@ -649,6 +681,7 @@ export default defineComponent({
         return {
             ...toRefs(state),
             fileTree,
+            uploadRef,
             enums,
             token,
             add,
@@ -670,9 +703,11 @@ export default defineComponent({
             beforeUpload,
             getFilePath,
             uploadSuccess,
+            uploadDirectory,
             dontOperate,
             formatFileSize,
             refresh,
+            folderMode
         };
     },
 });

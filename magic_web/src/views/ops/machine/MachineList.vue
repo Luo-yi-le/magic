@@ -174,7 +174,7 @@ import { toRefs, reactive, onMounted, defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { machineApi } from './api';
-import { projectApi } from '../project/api.ts';
+import { projectApi } from '../project/api';
 import ServiceManage from './ServiceManage.vue';
 import FileManage from './FileManage.vue';
 import MachineEdit from './MachineEdit.vue';

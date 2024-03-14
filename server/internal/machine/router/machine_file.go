@@ -76,6 +76,14 @@ func InitMachineFileRouter(router *gin.RouterGroup) {
 				Handle(mf.UploadFile)
 		})
 
+		uploadDirectory := ctx.NewLogInfo("文件夹上传").WithSave(true)
+		udP := ctx.NewPermission("machine:file:upload")
+		machineFile.POST(":machineId/files/:fileId/upload/directory", func(c *gin.Context) {
+			ctx.NewReqCtxWithGin(c).WithLog(uploadDirectory).
+				WithRequiredPermission(udP).
+				Handle(mf.UploadDirectory)
+		})
+
 		removeFile := ctx.NewLogInfo("删除文件or文件夹").WithSave(true)
 		rfP := ctx.NewPermission("machine:file:rm")
 		machineFile.DELETE(":machineId/files/:fileId/remove", func(c *gin.Context) {

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"io/ioutil"
+	"path"
 	"magic/internal/machine/domain/entity"
 	"magic/internal/machine/domain/repository"
 	"magic/pkg/biz"
@@ -13,7 +15,10 @@ import (
 
 	"github.com/pkg/sftp"
 )
-
+var(
+	dir string
+	key string
+)
 type MachineFile interface {
 	// 分页获取机器文件信息列表
 	GetPageList(condition *entity.MachineFile, pageParam *model.PageParam, toEntity interface{}, orderBy ...string) *model.PageResult
@@ -47,6 +52,9 @@ type MachineFile interface {
 
 	// 文件上传
 	UploadFile(fileId uint64, path, filename string, reader io.Reader)
+
+	// 文件夹上传
+	UploadDirectory(fileId uint64, path, filename string, reader io.Reader)
 
 	// 移除文件
 	RemoveFile(fileId uint64, path string)
@@ -161,6 +169,45 @@ func (m *machineFileAppImpl) UploadFile(fileId uint64, path, filename string, re
 
 	io.Copy(createfile, reader)
 }
+// 上传文件夹
+func (m *machineFileAppImpl) UploadDirectory(fileId uint64, path, filename string, reader io.Reader) {
+	path, machineId := m.checkAndReturnPathMid(fileId, path)
+	if !strings.HasSuffix(path, "/") {
+		path = path + "/"
+	}
+
+	sftpCli := m.getSftpCli(machineId)
+	createfile, err := sftpCli.Create(path + filename)
+	biz.ErrIsNilAppendErr(err, "创建文件夹失败: %s")
+	defer createfile.Close()
+
+	io.Copy(createfile, reader)
+}
+
+func getFiles(dir string) <-chan string {
+	paths := make(chan string)
+	go func() {
+		defer close(paths)
+		gets(paths, dir)
+	}()
+	return paths
+}
+
+func gets(paths chan string, dir_ string) {
+	infos, e := ioutil.ReadDir(dir_)
+	biz.ErrIsNilAppendErr(e, "打开文件夹失败: %s")
+	for _, info := range infos {
+		subPath := path.Join(dir_, info.Name())
+		if info.IsDir() {
+			gets(paths, subPath)
+		}else {
+			abs := strings.Replace(subPath, dir, "", 1)
+			paths <- abs[1:]
+		}
+	}
+}
+
+
 
 // 删除文件
 func (m *machineFileAppImpl) RemoveFile(fileId uint64, path string) {

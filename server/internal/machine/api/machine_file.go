@@ -172,6 +172,35 @@ func (m *MachineFile) UploadFile(rc *ctx.ReqCtx) {
 	}()
 }
 
+func (m *MachineFile) UploadDirectory(rc *ctx.ReqCtx) {
+	g := rc.GinCtx
+	fid := GetMachineFileId(g)
+	path := g.PostForm("path")
+
+	fileheader, err := g.FormFile("file")
+	biz.ErrIsNilAppendErr(err, "读取文件失败: %s")
+
+	file, _ := fileheader.Open()
+	rc.ReqParam = fmt.Sprintf("path: %s", path)
+
+	la := rc.LoginAccount
+	go func() {
+		defer func() {
+			if err := recover(); err != nil {
+				switch t := err.(type) {
+				case *biz.BizError:
+					m.MsgApp.CreateAndSend(la, ws.ErrMsg("文件上传失败", fmt.Sprintf("执行文件上传失败：\n<-e errCode: %d, errMsg: %s", t.Code(), t.Error())))
+				}
+			}
+		}()
+		defer file.Close()
+		m.MachineFileApp.UploadDirectory(fid, path, fileheader.Filename, file)
+		// 保存消息并发送文件上传成功通知
+		machine := m.MachineApp.GetById(m.MachineFileApp.GetById(fid).MachineId)
+		m.MsgApp.CreateAndSend(la, ws.SuccessMsg("文件上传成功", fmt.Sprintf("[%s]文件已成功上传至 %s[%s:%s]", fileheader.Filename, machine.Name, machine.Ip, path)))
+	}()
+}
+
 func (m *MachineFile) RemoveFile(rc *ctx.ReqCtx) {
 	g := rc.GinCtx
 	fid := GetMachineFileId(g)
