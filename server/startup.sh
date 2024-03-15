@@ -4,7 +4,7 @@ execfile=./magic
 
 pid=`ps ax | grep -i 'magic' | grep -v grep | awk '{print $1}'`
 if [ ! -z "${pid}" ] ; then
-        echo "The magic already running, shutdown and restart..."
+        echo "重启"
         kill ${pid}
 fi
 
@@ -14,4 +14,4 @@ fi
 
 nohup "${execfile}" &
 
-echo "The magic running..."
+echo "启动"
